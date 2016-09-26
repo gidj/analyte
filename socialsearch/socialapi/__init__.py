@@ -24,8 +24,11 @@ class SocialAPIBase(object):
         sites. 'api_code' and 'api_name' are used for registering each search
         API class, and in turn limiting which API classes are available for
         performing searches. """
+
     api_code = NotImplemented
     api_name = NotImplemented
+
+    search_endpoints = NotImplemented
 
     class Meta:
         abstract = True
@@ -36,6 +39,11 @@ class SocialAPIBase(object):
     def keyword_search(self, keyword):
         raise NotImplementedError
 
+    def search_result(self, row):
+        return {u"title" : NotImplemented,
+                u"content_link": NotImplemented}
+
+    @property
     def search_results_list(self):
         raise NotImplementedError
 

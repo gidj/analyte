@@ -18,7 +18,8 @@ class SocialMediaNetwork(models.Model):
         return self.name
 
     def api_connection(self):
-        return socialapi.get_api_class(self.api_code)
+        APIConnectionClass = socialapi.get_api_class(self.api_code)
+        return APIConnectionClass()
 
 
 class SocialSearch(models.Model):
@@ -27,6 +28,37 @@ class SocialSearch(models.Model):
     # If self.frequency is None, never repeat.
     frequency = models.DurationField(u"Time between executions", blank=True, default=None)
     query = models.CharField(u"Keyword Term", blank=False)
+
+    def execute_social_search(self):
+        execution = SocialSearchExecution.objects.create(
+            social_search=self,
+            searched_query=self.query,
+            date=datetime.now()
+        )
+        execution.save()
+
+        # Search all of the selected social networks
+        for network in self.social_networks.all():
+            connection = network.api_connection()
+            connection.keyword_search(self.query)
+            results = connection.search_results_list
+
+            # Create search result objects for each returned result
+            for result in results:
+                r = SocialSearchResult.objects.create(
+                    search_execution=execution,
+                    title=result["title"],
+                    content_link=result["content_link"],
+                    source=network)
+                r.save()
+
+    def schedule_search_task(self):
+        # Assuming we are using Celery
+        if self.frequency:
+            pass
+        else:
+
+            pass
 
 
 class SocialSearchExecution(models.Model):
@@ -44,8 +76,13 @@ class SocialSearchExecution(models.Model):
         for result in self.results.all():
             rows.append(result.data_to_row)
 
-        # Returns csv file object
+        # Returns csv file objec
         return write_to_csv_file(self._csv_filename, rows)
+
+    def send_in_email(self, email_addresses=[], attachments=[]):
+        # TODO: Fill in this using a library, or some custom implementation
+        return None
+
 
     @property
     def _csv_filename(self):
