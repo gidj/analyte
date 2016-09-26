@@ -25,13 +25,7 @@ urlpatterns = [
 urlpatterns += [
     url(r'^searches/$', search_views.Searches.as_view(), name="searches"),
     url(r'^searches/(?P<search_id>[0-9]+)$', search_views.SearchDetail.as_view(), name="search_detail"),
-    url(r'^searches/(?P<search_id>[0-9]+)$/new', search_views.SearchDetail, name="search_detail"),
-    url(r'^searches/(?P<search_id>[0-9]+)$/edit', search_views.search_detail, name="search_detail"),
+    url(r'^searches/(?P<search_id>[0-9]+)$/new', search_views.SearchDetailCreate.as_view(), name="search_ create"),
+    url(r'^searches/(?P<search_id>[0-9]+)$/edit', search_views.SearchDetailEdit, name="search_edit"),
     url(r'^searches/(?P<search_id>[0-9]+)/runs/$', search_views.ExecutedSearches.as_view(), name="executed_searches"),
-
-
-
-    url(r'^searches/(?P<search_id>[0-9]+)/runs/(?Q<execution_id>[0-9]+)$', search_views.results, name="results")
-
-
 ]
