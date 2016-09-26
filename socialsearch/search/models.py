@@ -29,6 +29,9 @@ class SocialSearch(models.Model):
     frequency = models.DurationField(u"Time between executions", blank=True, default=None)
     query = models.CharField(u"Keyword Term", blank=False)
 
+    # Let's assume celery is setup properly
+    from celery.task import app
+    @app.task()
     def execute_social_search(self):
         execution = SocialSearchExecution.objects.create(
             social_search=self,
@@ -55,9 +58,8 @@ class SocialSearch(models.Model):
     def schedule_search_task(self):
         # Assuming we are using Celery
         if self.frequency:
-            pass
+            self.execute_social_search.schedule(run_every=self.frequency)
         else:
-
             pass
 
 
