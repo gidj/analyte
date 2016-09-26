@@ -19,7 +19,13 @@ specialized User classes.
 3. That the user will just want the default number of records returned for their query; the ability
 to add a specific number could be done fairly easily, although we might have to hit the API more
 once, keeping track of pages/slices.
-4. Probably more.
+4. I assumed that if someone is creating a new search, they want to run it now, and optionally
+at some recurring time in the future. Perhaps they just want to schedule it for the future, but
+not run it now. The scheduling was also done in such a way as to be performed "every x duration".
+The user might want to have it run at certain times, every so often. That would be something I would
+talk to a product manager about to nail down the spec.
+5. Probably more.
+
 
 A few caveats:
 1. The way I implemented this, a user can save a specific social media search, but they can also

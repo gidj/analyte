@@ -43,6 +43,11 @@ class SearchDetailCreate(View):
             search = form.save(commit=False)
             search.user = request.user
             search.save()
+
+            # Actually run the search, and schedule it for the future
+            search.execute_social_search()
+            search.schedule_search_task()
+
             return HttpResponseRedirect(reverse("search_detail", args=[search.id]))
 
         self.context["form"] = form
