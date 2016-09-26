@@ -28,4 +28,5 @@ urlpatterns += [
     url(r'^searches/(?P<search_id>[0-9]+)$/new', search_views.SearchDetailCreate.as_view(), name="search_ create"),
     url(r'^searches/(?P<search_id>[0-9]+)$/edit', search_views.SearchDetailEdit, name="search_edit"),
     url(r'^searches/(?P<search_id>[0-9]+)/runs/$', search_views.ExecutedSearches.as_view(), name="executed_searches"),
+    url(r'^searches/(?P<search_id>[0-9]+)/runs/(?P<execution_id>[0-9]+)$', search_views.ExecutedSearchDetail.as_view(), name="executed_detail"),
 ]

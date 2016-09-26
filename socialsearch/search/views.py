@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 
 from search.models import SocialSearch, SocialSearchExecution, SocialSearchResult
-from search.forms import SocialSearchModelForm
+from search.forms import SocialSearchModelForm, CSVExportForm
 
 @method_decorator(login_required, name="dispatch")
 class Searches(ListView):
@@ -62,4 +62,34 @@ class ExecutedSearches(ListView):
     def get_queryset(self):
         return SocialSearchExecution.objects.filter(user=self.request.user)
 
+
+class ExecutedSearchDetail(View):
+    context = {}
+    template_name = u"search/executed_detail.html"
+
+    email_form = CSVExportForm
+
+    @login_required
+    def get(self, request, *args, **kwargs):
+        self.context["form"] = self.email_form()
+        return render(request, self.template_name, self.context)
+
+    @login_required
+    def post(self, request, *args, **kwargs):
+        form = self.email_form(request.POST)
+
+        if form.is_valid():
+            execution_id = kwargs.pop("execution_id")
+            execution = SocialSearchExecution.objects.get(id=execution_id)
+
+            email_address = form.cleaned_data["email_address"]
+
+            execution.send_in_email(
+                email_addresses=[email_address],
+                attachments=[execution.as_csv_file()]
+            )
+
+            # Should add a success message here if we are using a messages framework
+
+        return render(request, self.template_name, self.context)
 
