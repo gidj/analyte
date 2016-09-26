@@ -8,8 +8,8 @@ _SOCIAL_API_CHOICES = []
 
 def register_social_api(api_class):
     # This decorator registers a class as SocialAPI
-    _SOCIAL_API_MAP[api_class.key] = api_class
-    _SOCIAL_API_CHOICES.append([api_class.key, api_class.name])
+    _SOCIAL_API_MAP[api_class.api_code] = api_class
+    _SOCIAL_API_CHOICES.append([api_class.api_code, api_class.api_name])
     return api_class
 
 def get_api_class(api_code):
@@ -17,6 +17,7 @@ def get_api_class(api_code):
 
 def api_code_choices():
     return _SOCIAL_API_CHOICES
+
 
 class SocialAPIBase(object):
     """ Abstract Base Class for building searching objects for social media
