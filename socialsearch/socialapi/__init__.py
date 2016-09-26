@@ -28,20 +28,13 @@ class SocialAPIBase(object):
     api_code = NotImplemented
     api_name = NotImplemented
 
-    search_endpoints = NotImplemented
+    search_endpoint = NotImplemented
 
     class Meta:
         abstract = True
 
-    def open_connection(self):
-        raise NotImplementedError
-
     def keyword_search(self, keyword):
         raise NotImplementedError
-
-    def search_result(self, row):
-        return {u"title" : NotImplemented,
-                u"content_link": NotImplemented}
 
     @property
     def search_results_list(self):
@@ -50,17 +43,49 @@ class SocialAPIBase(object):
 
 @register_social_api
 class RedditAPI(SocialAPIBase):
-    """ Interfaces with Reddit's API to search for keywords. """
+    """ Interfaces with Reddit's API to search for keywords.
+        This is mostly pseudocode, there are several options to build this out--
+        use a third party library, use the requests package, etc. """
     api_code = u"REDDIT"
     api_name = u"Reddit Search API"
 
+    search_endpoint = "https/www.reddit.com/search"
 
-@register_social_api
+    def _build_query(keyword):
+        return ".json?q={}&sort=new".format(keyword)
+
+    def _process_data(self, response):
+        data = []
+        for record in response["payload"]:
+            row = {"title": record["title"],
+                   "content_link": record["url"]}
+            data.append(row)
+        return data
+
+    def keyword_search(self, keyword):
+        self._response = get_response(self.search_endpoint + self._build_query)
+        self._clean_data = self._process_data(self._respons)
+
+    @property
+    def search_results_list(self):
+        return self._clean_data
+
+
 class TwitterAPI(SocialAPIBase):
-    """ Interface with Twitter's API to search for keywords. """
+    """ Interface with Twitter's API to search for keywords.
+        I would build out this class in a similar way to RedditAPI, but
+        obviously making the methods specific to Twitter instead of Reddit. """
     api_code = u"TWITTER"
     api_name = u"Twitter Search API"
 
-    # Twitter's API is OAuth2 based, so we ne
-    pass
+
+@register_social_api
+class CrawlerAPI(SocialAPIBase):
+    """ Some sites may not have an API exposed. I'm not going to do it now,
+        but we could write our own crawler for any arbitrary site. As long as
+        it conforms to the interfaces of the base class, and we decorate it
+        with @register_social_api, it would be available for search.models.SocialMediaNetwork
+        to use to perform a search. """
+    api_code = u"BUSINESSINSIDER"
+    api_name = u"Business Insider Crawler"
 
